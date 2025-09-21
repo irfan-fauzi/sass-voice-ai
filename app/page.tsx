@@ -1,9 +1,12 @@
-import React from 'react'
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   return (
-    <div>Page</div>
-  )
-}
+    <>
+      <div className='text-2xl'>Welcome to my Ass</div>
+      <Button>click</Button>
+    </>
+  );
+};
 
-export default Page
+export default Page;
