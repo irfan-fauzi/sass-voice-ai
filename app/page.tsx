@@ -2,6 +2,7 @@ import CompanionCard from "@/components/CompanionCard";
 import CompanionList from "@/components/CompanionList";
 import Cta from "@/components/CTA";
 import { Button } from "@/components/ui/button";
+import { recentSessions } from "@/constants";
 
 const Page = () => {
   return (
@@ -34,7 +35,11 @@ const Page = () => {
         />
       </section>
       <section className='home-section'>
-        <CompanionList />
+        <CompanionList
+          title='Recentry completed session'
+          companions={recentSessions}
+          className='w-2/3 max-lg:w-full'
+        />
         <Cta />
       </section>
     </main>
