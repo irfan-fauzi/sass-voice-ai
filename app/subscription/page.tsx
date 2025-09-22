@@ -2,7 +2,7 @@ import React from 'react'
 
 const SubscriptionPage = () => {
   return (
-    <div>SubscriptionPage</div>
+    <div>SubscriptionPage 1</div>
   )
 }
 
