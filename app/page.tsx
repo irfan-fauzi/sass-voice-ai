@@ -42,6 +42,7 @@ const Page = () => {
         />
         <Cta />
       </section>
+      
     </main>
   );
 };
