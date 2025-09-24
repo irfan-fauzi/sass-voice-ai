@@ -13,7 +13,7 @@ const Cta = () => {
         voice conversation that feel natural and fun.
       </p>
       <Image src='images/cta.svg' alt='cta' width={362} height={232} />
-      <button className='btn-primary'>
+      <button className='bg-green-700 hover:bg-green-600 text-white rounded-xl cursor-pointer px-4 py-2 flex items-center gap-2'>
         <Image src='/icons/plus.svg' alt='plus' width={12} height={12} />
         <Link href='/companions/new'>
           <p>Build a New Companion</p>
