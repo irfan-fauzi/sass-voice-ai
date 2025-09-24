@@ -90,11 +90,7 @@ const CompanionList = ({
               </TableCell>
             </TableRow>
           ))}
-          {/* <TableRow>
-            <TableCell className='font-medium'>{ }</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-          </TableRow> */}
+        
         </TableBody>
       </Table>
     </article>
