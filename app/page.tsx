@@ -34,13 +34,14 @@ const Page = () => {
           color='#ffff'
         />
       </section>
-      <section className='home-section'>
+      <section className='home-section  mb-20'>
         <CompanionList
           title='Recentry completed session'
           companions={recentSessions}
           className='w-2/3 max-lg:w-full'
         />
         <Cta />
+        
       </section>
       
     </main>
