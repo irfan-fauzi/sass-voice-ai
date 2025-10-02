@@ -26,7 +26,6 @@ enum CallStatus {
 }
 
 const VapiUI = ({
-  companionId,
   subject,
   topic,
   name,
@@ -38,6 +37,7 @@ const VapiUI = ({
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [message, setMessages] = useState<SavedMessage[]>([]);
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
   useEffect(() => {
@@ -53,27 +53,36 @@ const VapiUI = ({
   useEffect(() => {
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
-    const onMessage = () => {};
+    const onMessage = (message: Message) => {
+      if (message.type === "transcript" && message.transcriptType === "final") {
+        const newMessage = {
+          role: message.role,
+          content: message.transcript,
+        };
+
+        setMessages((prev) => [newMessage, ...prev]);
+      }
+    };
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
 
     const onError = (error: Error) => console.log("Error dari server", error);
 
-    vapi.on('call-start', onCallStart);
-        vapi.on('call-end', onCallEnd);
-        vapi.on('message', onMessage);
-        vapi.on('error', onError);
-        vapi.on('speech-start', onSpeechStart);
-        vapi.on('speech-end', onSpeechEnd);
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("message", onMessage);
+    vapi.on("error", onError);
+    vapi.on("speech-start", onSpeechStart);
+    vapi.on("speech-end", onSpeechEnd);
 
-        return () => {
-            vapi.off('call-start', onCallStart);
-            vapi.off('call-end', onCallEnd);
-            vapi.off('message', onMessage);
-            vapi.off('error', onError);
-            vapi.off('speech-start', onSpeechStart);
-            vapi.off('speech-end', onSpeechEnd);
-        }
+    return () => {
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("message", onMessage);
+      vapi.off("error", onError);
+      vapi.off("speech-start", onSpeechStart);
+      vapi.off("speech-end", onSpeechEnd);
+    };
   }, []);
 
   const toggleMicroPhone = () => {
@@ -93,7 +102,7 @@ const VapiUI = ({
       clientMessages: ["transcript"],
       serverMessages: [],
     };
-// @ts-expect-error 
+    // @ts-expect-error
     vapi.start(configureAssistant(voice, style), assistantOverrides);
   };
 
@@ -156,7 +165,11 @@ const VapiUI = ({
             />
             <p className='font-bold text-2xl'>{userName}</p>
           </div>
-          <button className='btn-mic' onClick={toggleMicroPhone}>
+          <button
+            className='btn-mic'
+            onClick={toggleMicroPhone}
+            disabled={callStatus !== CallStatus.ACTIVE}
+          >
             <Image
               src={isMuted ? "/icons/mic-off.svg" : "/icons/mic-on.svg"}
               alt='mic'
@@ -186,7 +199,27 @@ const VapiUI = ({
         </div>
       </section>
       <section className='transcript'>
-        <div className='transcript-message no-scrollbar'>MESSAGES</div>
+        <div className='transcript-message no-scrollbar'>
+          {message.map((message, index) => {
+            const key = `${message.role}-${index}-${message.content.slice(
+              0,
+              8
+            )}`;
+            if (message.role === "assistant") {
+              return (
+                <p key={key} className='max-sm:text-sm'>
+                  {name.split(" ")[0].replace("/[.,]/g ", "")} :{" "}
+                  {message.content}
+                </p>
+              );
+            } else
+              return (
+                <p key={key} className='text-primary max-sm:text-sm'>
+                  {userName} : {message.content}
+                </p>
+              );
+          })}
+        </div>
         <div className='transcript-fade' />
       </section>
     </section>
