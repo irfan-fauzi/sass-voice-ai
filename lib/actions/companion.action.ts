@@ -23,8 +23,9 @@ export const getAllCompanion = async ({
   subject,
   topic,
 }: GetAllCompanions) => {
+  const { userId } = await auth();
   const supabase = createSupabaseClient();
-  let query = supabase.from("companions").select();
+  let query = supabase.from("companions").select().eq("author", userId);
 
   if (subject && topic) {
     query = query
@@ -51,5 +52,29 @@ export const getCompanion = async (id: string) => {
     .eq("id", id);
 
   if (error) return console.log(error);
-  return data[0]
+  return data[0];
+};
+
+export const addToSessionHistory = async (companionId: string) => {
+  const { userId } = await auth();
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase.from("session_history").insert({
+    companion_id: companionId,
+    user_id: userId,
+  });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+export const getSessionHistoty = async () => {
+  const { userId } = await auth();
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("session_history")
+    .select("id, user_id, companion_id")
+    .eq("user_id", userId);
+  if (error) throw new Error(error.message);
+  return data;
 };

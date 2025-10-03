@@ -1,10 +1,14 @@
 import CompanionCard from "@/components/CompanionCard";
 import SearchInput from "@/components/SearchInput";
 import SubjectFilter from "@/components/SubjectFilter";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { getAllCompanion } from "@/lib/actions/companion.action";
 import { getSubjectColor } from "@/lib/utils";
 
 const CompanionPage = async ({ searchParams }: SearchParams) => {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
   const filter = await searchParams;
   const subject = filter.subject ? filter.subject : "";
   const topic = filter.topic ? filter.topic : "";
