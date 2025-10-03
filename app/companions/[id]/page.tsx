@@ -1,5 +1,5 @@
 import VapiUI from "@/components/VapiUI";
-import { getCompanion } from "@/lib/actions/companion.action";
+import { getCompanionById } from "@/lib/actions/companion.action";
 import { getSubjectColor } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
@@ -11,7 +11,7 @@ interface CompanionSessionPageProps {
 
 const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
   const { id } = await params;
-  const detailCompanion = await getCompanion(id);
+  const detailCompanion = await getCompanionById(id);
   const { name, subject, topic, duration } = detailCompanion;
   const user = await currentUser();
   if (!user) redirect("/sign-in");

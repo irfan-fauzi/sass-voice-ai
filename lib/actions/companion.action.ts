@@ -44,7 +44,7 @@ export const getAllCompanion = async ({
   return companions;
 };
 
-export const getCompanion = async (id: string) => {
+export const getCompanionById = async (id: string) => {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
     .from("companions")
@@ -68,22 +68,58 @@ export const addToSessionHistory = async (companionId: string) => {
   return data;
 };
 
-export const getUser = async () => {
+export const getUser = async (): Promise<UserResponse> => {
   try {
     const { userId } = await auth();
-    if (!userId) return null;
+
     const client = await clerkClient();
-    const user = await client.users.getUser(userId);
-    if (!user) throw new Error();
-    const objUser = {
-      fisName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.primaryEmailAddress?.emailAddress,
-      profilImg: user?.imageUrl,
+    const user = await client.users.getUser(userId as string);
+    if (!user) {
+      return {
+        data: null,
+        error: "user not found",
+      };
+    }
+    return {
+      data: {
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.primaryEmailAddress?.emailAddress,
+        profileImg: user?.imageUrl,
+      },
+      error: null,
     };
-    return objUser;
   } catch (error) {
     console.error("Clerk get user error: ", error);
-    return null
+    return { data: null, error: "Failed to fetch user" };
   }
 };
+
+export const getHistoryCompanion = async () => {
+  const { userId } = await auth();
+  if (!userId) return { data: null, error: "Unauthorized" };
+
+  const supabase = createSupabaseClient();
+
+  // 1. Ambil data history
+  const { data: history, error: errorHistory } = await supabase
+    .from("session_history")
+    .select("companion_id")
+    .eq("user_id", userId);
+
+  if (errorHistory) return { data: null, error: errorHistory.message };
+  if (!history || history.length === 0) return { data: [], error: null };
+
+  // 2. Ambil list companion_id dari history
+  const companionIds = history.map((h) => h.companion_id);
+
+  // 3. Ambil data companion berdasarkan companion_id
+  const { data: companions, error: errorCompanions } = await supabase
+    .from("companions")
+    .select("*")
+    .in("id", companionIds); // pakai .in untuk filter by array id
+
+  if (errorCompanions) return { data: null, error: errorCompanions.message };
+
+  return { data: companions, error: null };
+}

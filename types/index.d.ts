@@ -4,6 +4,16 @@
 //   image?: string;
 //   accountId: string;
 // };
+interface UserResponse  {
+  data: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string | undefined;
+    profileImg: string;
+  } | null;
+  error: string | null;
+};
+
 
 enum Subject {
   maths = "maths",
